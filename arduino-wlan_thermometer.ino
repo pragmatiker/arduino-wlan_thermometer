@@ -1,13 +1,5 @@
-/* DHTServer - ESP8266 Webserver with a DHT sensor as an input
-
-   Based on ESP8266Webserver, DHTexample, and BlinkWithoutDelay (thank you)
-
-   Version 1.0  5/3/2014  Version 1.0   Mike Barela for Adafruit Industries
-*/
 #include <ESP8266WiFi.h>
-#include <WiFiClient.h>
 #include <ESP8266WebServer.h>
-#include <ESP8266mDNS.h>        // Include the mDNS library
 #include <DHT.h>
 #include "arduino-secrets.h"
 
@@ -19,15 +11,7 @@ const char* password = WIFI_PASSWD;
 
 ESP8266WebServer server(80);
  
-// Initialize DHT sensor 
-// NOTE: For working with a faster than ATmega328p 16 MHz Arduino chip, like an ESP8266,
-// you need to increase the threshold for cycle counts considered a 1 or 0.
-// You can do this by passing a 3rd parameter for this threshold.  It's a bit
-// of fiddling to find the right value, but in general the faster the CPU the
-// higher the value.  The default for a 16mhz AVR is a value of 6.  For an
-// Arduino Due that runs at 84mhz a value of 30 works.
-// This is for the ESP8266 processor on ESP-01 
-DHT dht(DHTPIN, DHTTYPE, 11); // 11 works fine for ESP8266
+DHT dht(DHTPIN, DHTTYPE, 11); // Threshold 11 works fine for ESP8266 
  
 float humidity, temp_c;  // Values read from sensor
 String webString="";     // String to display
@@ -60,11 +44,6 @@ void setup(void)
   server.on("/", handle_root);  
   server.begin();
   Serial.println("HTTP server started");
-  
-  if (!MDNS.begin("garage")) {             // Start the mDNS responder for esp8266.local
-    Serial.println("Error setting up MDNS responder!");
-  }
-  Serial.println("mDNS responder started");
 }
  
 void loop(void) {
@@ -114,10 +93,10 @@ String SendHTML(float Temperaturestat,float Humiditystat){
   ptr +="<h1>Weather Report</h1>\n";
   
   ptr +="<p>Temperature: ";
-  if ((int)Temperaturestat > 30) {
+  if ((int)Temperaturestat >= 30) {
     ptr +="<span style=\"color:red;\">";
   }  
-  else if ((int)Temperaturestat < 30 && (int)Temperaturestat > 25 ) {
+  else if ((int)Temperaturestat < 30 && (int)Temperaturestat >= 25 ) {
     ptr +="<span style=\"color:orange;\">";
   }
   else if ((int)Temperaturestat < 25 && (int)Temperaturestat > 18 ) {
